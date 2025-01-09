@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:netflix/core/constants/api_url.dart';
 
 import 'interceptors.dart';
 
@@ -7,6 +8,7 @@ class DioClient {
   DioClient()
       : _dio = Dio(
           BaseOptions(
+              baseUrl: ApiUrl.baseURL,
               headers: {
                 'Content-Type': 'application/json; charset=UTF-8'
               },

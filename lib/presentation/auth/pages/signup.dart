@@ -1,13 +1,19 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:netflix/core/configs/theme/app_colors.dart';
+import 'package:netflix/data/auth/models/signup_req_params.dart';
+import 'package:netflix/domain/auth/usecases/signup.dart';
 import 'package:netflix/presentation/auth/pages/signin.dart';
+import 'package:netflix/service_locator.dart';
 import 'package:reactive_button/reactive_button.dart';
 
 import '../../../common/helper/navigation/app_navigation.dart';
 
 class SignUpPage extends StatelessWidget {
-  const SignUpPage({super.key});
+  SignUpPage({super.key});
+
+  final TextEditingController _emailCon = TextEditingController();
+  final TextEditingController _passwordCon = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +51,7 @@ class SignUpPage extends StatelessWidget {
 
   Widget _emailField() {
     return TextField(
+      controller: _emailCon,
       decoration: InputDecoration(
         hintText: 'Email',
       ),
@@ -53,6 +60,7 @@ class SignUpPage extends StatelessWidget {
 
   Widget _passwordField() {
     return TextField(
+      controller: _passwordCon,
       decoration: InputDecoration(
         hintText: 'Password',
       ),
@@ -63,7 +71,14 @@ class SignUpPage extends StatelessWidget {
     return ReactiveButton(
       title: 'Sign In',
       activeColor: AppColors.primary,
-      onPressed: () async {},
+      onPressed: () async {
+        await sl<SignUpUseCase>().call(
+          params: SignUpReqParams(
+            email: _emailCon.text,
+            password: _passwordCon.text,
+          ),
+        );
+      },
       onSuccess: () {},
       onFailure: (error) {},
     );
