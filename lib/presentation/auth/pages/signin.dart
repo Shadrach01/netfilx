@@ -1,13 +1,22 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:netflix/common/helper/message/display_message.dart';
 import 'package:netflix/common/helper/navigation/app_navigation.dart';
 import 'package:netflix/core/configs/theme/app_colors.dart';
+import 'package:netflix/data/auth/models/signin_req_params.dart';
+import 'package:netflix/domain/auth/usecases/signin.dart';
 import 'package:netflix/presentation/auth/pages/signup.dart';
+import 'package:netflix/service_locator.dart';
 import 'package:reactive_button/reactive_button.dart';
 
-class SignInPage extends StatelessWidget {
-  const SignInPage({super.key});
+import '../../home/pages/home.dart';
 
+class SignInPage extends StatelessWidget {
+  SignInPage({super.key});
+
+  final TextEditingController _emailCon = TextEditingController();
+
+  final TextEditingController _passwordCon = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +32,7 @@ class SignInPage extends StatelessWidget {
             const SizedBox(height: 20),
             _passwordField(),
             const SizedBox(height: 60),
-            _signInButton(),
+            _signInButton(context),
             const SizedBox(height: 10),
             _signUpText(context),
           ],
@@ -44,7 +53,8 @@ class SignInPage extends StatelessWidget {
 
   Widget _emailField() {
     return TextField(
-      decoration: InputDecoration(
+      controller: _emailCon,
+      decoration: const InputDecoration(
         hintText: 'Email',
       ),
     );
@@ -52,19 +62,29 @@ class SignInPage extends StatelessWidget {
 
   Widget _passwordField() {
     return TextField(
-      decoration: InputDecoration(
+      controller: _passwordCon,
+      decoration: const InputDecoration(
         hintText: 'Password',
       ),
     );
   }
 
-  Widget _signInButton() {
+  Widget _signInButton(BuildContext context) {
     return ReactiveButton(
       title: 'Sign In',
       activeColor: AppColors.primary,
-      onPressed: () async {},
-      onSuccess: () {},
-      onFailure: (error) {},
+      onPressed: () async => sl<SignInUseCase>().call(
+        params: SignInReqParams(
+          email: _emailCon.text,
+          password: _passwordCon.text,
+        ),
+      ),
+      onSuccess: () {
+        AppNavigator.pushAndRemove(context, const HomePage());
+      },
+      onFailure: (error) {
+        DisplayMessage.errorMessage(error, context);
+      },
     );
   }
 

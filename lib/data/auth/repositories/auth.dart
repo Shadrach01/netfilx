@@ -1,7 +1,9 @@
 import 'package:dartz/dartz.dart';
+import 'package:netflix/data/auth/models/signin_req_params.dart';
 import 'package:netflix/data/auth/sources/auth_api_service.dart';
 import 'package:netflix/domain/auth/repositories/auth.dart';
 import 'package:netflix/service_locator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/signup_req_params.dart';
 
@@ -9,6 +11,46 @@ class AuthRepoImpl extends AuthRepository {
   // Sign up method implementation
   @override
   Future<Either> signUp(SignUpReqParams params) async {
-    return await sl<AuthApiService>().signUp(params);
+    var data = await sl<AuthApiService>().signUp(params);
+    return data.fold(
+      (error) {
+        return Left(error);
+      },
+      (data) async {
+        final SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.setString('token', data['user']['token']);
+        return Right(data);
+      },
+    );
+  }
+
+  @override
+  Future<Either> signIn(SignInReqParams params) async {
+    var data = await sl<AuthApiService>().signIn(params);
+    return data.fold(
+      (error) {
+        return Left(error);
+      },
+      (data) async {
+        final SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.setString('token', data['user']['token']);
+        return Right(data);
+      },
+    );
+  }
+
+  @override
+  Future<bool> isLoggedIn() async {
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    var token = sharedPreferences.getString('token');
+
+    if (token == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }

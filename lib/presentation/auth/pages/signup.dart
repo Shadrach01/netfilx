@@ -4,9 +4,11 @@ import 'package:netflix/core/configs/theme/app_colors.dart';
 import 'package:netflix/data/auth/models/signup_req_params.dart';
 import 'package:netflix/domain/auth/usecases/signup.dart';
 import 'package:netflix/presentation/auth/pages/signin.dart';
+import 'package:netflix/presentation/home/pages/home.dart';
 import 'package:netflix/service_locator.dart';
 import 'package:reactive_button/reactive_button.dart';
 
+import '../../../common/helper/message/display_message.dart';
 import '../../../common/helper/navigation/app_navigation.dart';
 
 class SignUpPage extends StatelessWidget {
@@ -30,7 +32,7 @@ class SignUpPage extends StatelessWidget {
             const SizedBox(height: 20),
             _passwordField(),
             const SizedBox(height: 60),
-            _signInButton(),
+            _signUpButton(context),
             const SizedBox(height: 10),
             _signInText(context),
           ],
@@ -67,7 +69,7 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
-  Widget _signInButton() {
+  Widget _signUpButton(BuildContext context) {
     return ReactiveButton(
       title: 'Sign In',
       activeColor: AppColors.primary,
@@ -79,8 +81,12 @@ class SignUpPage extends StatelessWidget {
           ),
         );
       },
-      onSuccess: () {},
-      onFailure: (error) {},
+      onSuccess: () {
+        AppNavigator.pushAndRemove(context, const HomePage());
+      },
+      onFailure: (error) {
+        DisplayMessage.errorMessage(error, context);
+      },
     );
   }
 
@@ -98,7 +104,7 @@ class SignUpPage extends StatelessWidget {
               ..onTap = () {
                 AppNavigator.push(
                   context,
-                  const SignInPage(),
+                  SignInPage(),
                 );
               },
           ),
